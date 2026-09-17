@@ -1,0 +1,2 @@
+import { getViewer } from "@/lib/identity";import { apiError,routeError } from "@/lib/http";import { buildReport,reportMarkdown } from "@/lib/report";
+export async function GET(request:Request){try{const viewer=getViewer(request);if(!viewer)return apiError("AUTH_REQUIRED","Sign in first.",401);return new Response(reportMarkdown(await buildReport(viewer.userId)),{headers:{"Content-Type":"text/markdown; charset=utf-8","Content-Disposition":"attachment; filename=sortify-feasibility.md"}});}catch(error){return routeError(error);}}
