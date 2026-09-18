@@ -1,4 +1,49 @@
 import { test, expect } from "@playwright/test";
+test("queued jobs can retry dispatch without discarding the saved selection", async ({
+  page,
+}) => {
+  const commands: unknown[] = [];
+  await page.route("**/api/**", async (route) => {
+    if (route.request().method() === "PATCH") {
+      commands.push(route.request().postDataJSON());
+      await route.fulfill({ json: { ok: true } });
+      return;
+    }
+    await route.fulfill({
+      json:
+        new URL(route.request().url()).pathname === "/api/sources"
+          ? []
+          : {
+              user: { name: "Listener" },
+              publications: [],
+              runs: [
+                {
+                  id: "queued-run",
+                  status: "queued",
+                  mode: "blend",
+                  revision: 0,
+                  approvedRevision: null,
+                  error: null,
+                  data: {
+                    sources: [],
+                    tracks: [],
+                    suggestions: [],
+                    enriched: 0,
+                  },
+                },
+              ],
+            },
+    });
+  });
+  await page.goto("/");
+  await expect(page.getByText("Getting ready…")).toBeVisible();
+  await page.getByRole("button", { name: "Retry start" }).click();
+  await expect.poll(() => commands.length).toBe(1);
+  expect(commands[0]).toEqual({ action: "resume", revision: 0 });
+  await expect(
+    page.getByRole("button", { name: "Cancel", exact: true }),
+  ).toBeVisible();
+});
 const track = {
   id: "0000000000000000000001",
   name: "A favorite song",

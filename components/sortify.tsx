@@ -683,6 +683,15 @@ export default function Sortify() {
                 Updates live. You can leave this page and come back.
               </p>
               <div className="actions">
+                {run.status === "queued" && (
+                  <button
+                    className="button"
+                    disabled={busy}
+                    onClick={() => act(() => command("resume"))}
+                  >
+                    Retry start
+                  </button>
+                )}
                 <button
                   className="text-button"
                   disabled={busy}

@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { sameOrigin, requireUser } from "../../../../lib/auth";
 import { db } from "../../../../lib/db";
 import { runs, publications } from "../../../../db/schema";
-import { inngest } from "../../../../lib/jobs";
+import { dispatchRun } from "../../../../lib/dispatch";
 import {
   validateEdit,
   canPublish,
@@ -189,7 +189,7 @@ export async function PATCH(
         dispatch = "sortify/publish";
       }
     });
-    if (dispatch) await inngest.send({ name: dispatch, data: { runId: id } });
+    if (dispatch) await dispatchRun(id, dispatch);
     return Response.json({ ok: true });
   } catch (e) {
     return failure(e);

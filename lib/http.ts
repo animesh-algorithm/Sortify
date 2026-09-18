@@ -4,6 +4,8 @@ export function failure(e: unknown) {
   });
   const message = e instanceof Error ? e.message : "";
   const actions: Record<string, string> = {
+    "Job dispatch failed":
+      "We could not start this job. Try again in a moment.",
     "Revision changed":
       "Your selection changed in another window. Refresh before saving.",
     "Approve your changes first":
@@ -26,11 +28,13 @@ export function failure(e: unknown) {
     },
     {
       status:
-        message === "Reconnect Spotify"
-          ? 401
-          : message === "Run already active"
-            ? 409
-            : 400,
+        message === "Job dispatch failed"
+          ? 503
+          : message === "Reconnect Spotify"
+            ? 401
+            : message === "Run already active"
+              ? 409
+              : 400,
     },
   );
 }

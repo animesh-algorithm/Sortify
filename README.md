@@ -22,6 +22,8 @@ Use the standard Next.js preset and Node 22 or newer. Configure the same environ
 
 Confirm the Spotify app's quota/access mode, owner Premium subscription, and account allowlist in the developer dashboard before live testing. Development Mode imports only owned or collaborative playlists, plus Liked Songs. Requests use `/items` and `POST /me/playlists`.
 
+Use the current stable production domain for the Inngest app URL (`https://sortifi.vercel.app/api/inngest`). After changing a Vercel domain, resync the Inngest app with the new URL and confirm a successful sync; events can be accepted while jobs fail against an obsolete URL. Queued jobs offer **Retry start**, and rejected event dispatches surface a recoverable failure instead of an indefinite progress screen.
+
 ## Checks
 
 `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`. With the local server running, `npm run test:browser` exercises mocked source/progress/editor/approval/publication screens and real unauthenticated OAuth/CSRF endpoints. Browser checks use installed Chrome by default; set `QA_CHROME_EXECUTABLE` for another installation. `npm run probe:recco` performs a read-only, two-ID provider contract probe.

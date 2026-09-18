@@ -5,7 +5,7 @@ import { sameOrigin, requireUser } from "../../../lib/auth";
 import { sources } from "../../../lib/spotify";
 import { db } from "../../../lib/db";
 import { runs } from "../../../db/schema";
-import { inngest } from "../../../lib/jobs";
+import { dispatchRun } from "../../../lib/dispatch";
 import { ALGORITHM } from "../../../lib/model";
 import { failure } from "../../../lib/http";
 export async function POST(req: Request) {
@@ -56,15 +56,7 @@ export async function POST(req: Request) {
           algorithm: ALGORITHM,
         },
       });
-    try {
-      await inngest.send({
-        id: `organization-${id}`,
-        name: "sortify/organize",
-        data: { runId: id },
-      });
-    } catch {
-      /* A queued run can be dispatched again through Resume. */
-    }
+    await dispatchRun(id, "sortify/organize", `organization-${id}`);
     return Response.json({ id }, { status: 201 });
   } catch (e) {
     if (
