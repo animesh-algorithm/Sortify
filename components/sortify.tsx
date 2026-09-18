@@ -1223,14 +1223,16 @@ export default function Sortify() {
               </dialog>
               <button
                 className="button"
-                disabled={busy}
+                disabled={busy || run.status === "publishing"}
                 onClick={() => {
                   setNewRun(true);
                   setDraft(null);
                   setDraftRevision(null);
                 }}
               >
-                Organize more music
+                {run.status === "publishing"
+                  ? "Finish adding playlists first"
+                  : "Organize more music"}
               </button>
             </section>
           ) : (

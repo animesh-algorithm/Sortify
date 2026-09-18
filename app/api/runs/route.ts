@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { and, eq, inArray } from "drizzle-orm";
 import { sameOrigin, requireUser } from "../../../lib/auth";
 import { sources } from "../../../lib/spotify";
 import { db } from "../../../lib/db";
@@ -17,6 +18,23 @@ export async function POST(req: Request) {
           mode: z.enum(["groups", "activity", "blend"]).default("blend"),
         })
         .parse(await req.json());
+    const [active] = await db()
+      .select({ id: runs.id })
+      .from(runs)
+      .where(
+        and(
+          eq(runs.userId, u.id),
+          inArray(runs.status, [
+            "queued",
+            "importing",
+            "enriching",
+            "analyzing",
+            "publishing",
+          ]),
+        ),
+      )
+      .limit(1);
+    if (active) throw new Error("Run already active");
     const accessible = await sources(u.id),
       selected = accessible.filter((s) => input.sources.includes(s.id));
     if (selected.length !== new Set(input.sources).size)
@@ -49,6 +67,15 @@ export async function POST(req: Request) {
     }
     return Response.json({ id }, { status: 201 });
   } catch (e) {
+    if (
+      typeof e === "object" &&
+      e !== null &&
+      "code" in e &&
+      e.code === "23505" &&
+      "constraint_name" in e &&
+      e.constraint_name === "one_active_run"
+    )
+      return failure(new Error("Run already active"));
     return failure(e);
   }
 }

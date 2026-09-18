@@ -12,6 +12,8 @@ export function failure(e: unknown) {
     "Cannot resume": "This step is already running. Give it a moment.",
     "Run cancelled":
       "This organization was cancelled. Choose music to start again.",
+    "Run already active":
+      "Finish the current organization before starting another.",
   };
   return Response.json(
     {
@@ -22,6 +24,13 @@ export function failure(e: unknown) {
             ? message
             : (actions[message] ?? "Something went wrong. Try again."),
     },
-    { status: message === "Reconnect Spotify" ? 401 : 400 },
+    {
+      status:
+        message === "Reconnect Spotify"
+          ? 401
+          : message === "Run already active"
+            ? 409
+            : 400,
+    },
   );
 }
