@@ -1,9 +1,12 @@
-import { env } from "cloudflare:workers";
-
-export function getD1(): D1Database {
-  if (!env.DB) throw new Error("D1 binding DB is unavailable");
-  return env.DB;
+import "server-only";
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+import * as schema from "../db/schema";
+let instance: ReturnType<typeof drizzle<typeof schema>>;
+export function db() {
+  if (!process.env.DATABASE_URL) throw new Error("Database is not configured");
+  return (instance ??= drizzle(
+    postgres(process.env.DATABASE_URL, { max: 5, prepare: false }),
+    { schema },
+  ));
 }
-
-export function uid(prefix: string) { return `${prefix}_${crypto.randomUUID().replaceAll("-", "")}`; }
-export function nowIso() { return new Date().toISOString(); }

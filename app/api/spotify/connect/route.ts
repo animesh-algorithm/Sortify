@@ -1,13 +1,28 @@
-import { getD1 } from "@/lib/db";
-import { getViewer } from "@/lib/identity";
-import { apiError, routeError } from "@/lib/http";
-import { spotifyAuthorizationUrl } from "@/lib/spotify";
-
-export async function GET(request: Request) {
-  try {
-    const viewer = getViewer(request); if (!viewer) return apiError("AUTH_REQUIRED", "Sign in to connect Spotify.", 401);
-    const state = crypto.randomUUID();
-    await getD1().prepare("INSERT INTO oauth_states (state,user_id,expires_at) VALUES (?,?,?)").bind(state, viewer.userId, new Date(Date.now() + 10 * 60_000).toISOString()).run();
-    return Response.redirect(spotifyAuthorizationUrl(state), 302);
-  } catch (error) { return routeError(error); }
+import { cookies } from "next/headers";
+import { randomToken } from "../../../../lib/security";
+import { cookieOptions } from "../../../../lib/auth";
+import { scopes } from "../../../../lib/spotify";
+import { spotifySetupError } from "../../../../lib/spotify-setup";
+export async function GET() {
+  const setupError = spotifySetupError();
+  if (setupError)
+    return Response.redirect(
+      new URL(
+        "/?error=" + setupError,
+        process.env.APP_URL ?? "http://127.0.0.1:3000",
+      ),
+    );
+  const state = randomToken();
+  (await cookies()).set("sortify_oauth", state, {
+    ...cookieOptions,
+    maxAge: 600,
+  });
+  const query = new URLSearchParams({
+    client_id: process.env.SPOTIFY_CLIENT_ID!,
+    response_type: "code",
+    redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
+    scope: scopes,
+    state,
+  });
+  return Response.redirect("https://accounts.spotify.com/authorize?" + query);
 }

@@ -1,23 +1,81 @@
-import { getD1 } from "@/lib/db";
-import { getViewer } from "@/lib/identity";
-import { apiError, routeError } from "@/lib/http";
-import { exchangeAuthorizationCode, storeSpotifyConnection } from "@/lib/spotify";
-
-export async function GET(request: Request) {
+import { cookies } from "next/headers";
+import { eq } from "drizzle-orm";
+import { cookieOptions } from "../../../../lib/auth";
+import { equal, randomToken, digest, encrypt } from "../../../../lib/security";
+import { tokenExchange } from "../../../../lib/spotify";
+import { db } from "../../../../lib/db";
+import { users, sessions } from "../../../../db/schema";
+import { spotifySetupError } from "../../../../lib/spotify-setup";
+export async function GET(req: Request) {
+  const url = new URL(req.url),
+    jar = await cookies(),
+    expected = jar.get("sortify_oauth")?.value;
+  jar.delete("sortify_oauth");
+  const base = process.env.APP_URL ?? url.origin;
+  let stage = "state";
   try {
-    const viewer = getViewer(request); if (!viewer) return apiError("AUTH_REQUIRED", "Sign in before completing Spotify authorization.", 401);
-    const url = new URL(request.url); const code = url.searchParams.get("code"); const state = url.searchParams.get("state");
-    if (url.searchParams.get("error")) return Response.redirect(new URL(`/?error=${encodeURIComponent(url.searchParams.get("error")!)}`, url.origin), 302);
-    if (!code || !state) return apiError("INVALID_INPUT", "Spotify callback is missing code or state.", 400);
-    const db = getD1();
-    const record = await db.prepare("SELECT user_id,expires_at FROM oauth_states WHERE state=?").bind(state).first<{ user_id: string; expires_at: string }>();
-    await db.prepare("DELETE FROM oauth_states WHERE state=?").bind(state).run();
-    if (!record || record.user_id !== viewer.userId || new Date(record.expires_at).getTime() < Date.now()) return apiError("CONFLICT", "This Spotify authorization request is invalid or expired.", 409);
-    const token = await exchangeAuthorizationCode(code);
-    const profileResponse = await fetch("https://api.spotify.com/v1/me", { headers: { Authorization: `Bearer ${token.access_token}` } });
-    if (!profileResponse.ok) throw new Error(`Spotify profile request failed (${profileResponse.status})`);
-    const profile = await profileResponse.json() as { id: string; display_name?: string | null };
-    await storeSpotifyConnection(viewer.userId, token, profile);
-    return Response.redirect(new URL("/?connected=1", url.origin), 302);
-  } catch (error) { return routeError(error); }
+    const state = url.searchParams.get("state"),
+      code = url.searchParams.get("code");
+    if (!expected || !state || !equal(expected, state) || !code)
+      throw new Error("Invalid OAuth state");
+    const setupError = spotifySetupError();
+    if (setupError) return Response.redirect(base + "/?error=" + setupError);
+    stage = "token";
+    const t = await tokenExchange(
+      new URLSearchParams({
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
+      }),
+    );
+    if (!t.refresh_token) throw new Error("Missing refresh token");
+    stage = "profile";
+    const r = await fetch("https://api.spotify.com/v1/me", {
+      headers: { Authorization: "Bearer " + t.access_token },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!r.ok) throw new Error("Profile failed");
+    const u = (await r.json()) as { id: string; display_name: string };
+    if (!u.id) throw new Error("Invalid profile");
+    stage = "session";
+    await db().transaction(async (tx) => {
+      await tx
+        .insert(users)
+        .values({
+          id: u.id,
+          name: u.display_name ?? "Music lover",
+          access: encrypt(t.access_token),
+          refresh: encrypt(t.refresh_token!),
+          expires: new Date(Date.now() + t.expires_in * 1000),
+        })
+        .onConflictDoUpdate({
+          target: users.id,
+          set: {
+            name: u.display_name ?? "Music lover",
+            access: encrypt(t.access_token),
+            refresh: encrypt(t.refresh_token!),
+            expires: new Date(Date.now() + t.expires_in * 1000),
+          },
+        });
+      const old = jar.get("sortify_session")?.value;
+      if (old) await tx.delete(sessions).where(eq(sessions.id, digest(old)));
+      const token = randomToken();
+      await tx.insert(sessions).values({
+        id: digest(token),
+        userId: u.id,
+        expires: new Date(Date.now() + 7 * 86400000),
+      });
+      jar.set("sortify_session", token, {
+        ...cookieOptions,
+        maxAge: 7 * 86400,
+      });
+    });
+    return Response.redirect(base);
+  } catch (e) {
+    console.warn("oauth-failed", {
+      stage,
+      reason: e instanceof Error ? e.name : "unknown",
+    });
+    return Response.redirect(base + "/?error=connect");
+  }
 }

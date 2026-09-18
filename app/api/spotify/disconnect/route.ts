@@ -1,8 +1,16 @@
-import { getD1 } from "@/lib/db";
-import { getViewer } from "@/lib/identity";
-import { apiError, json, routeError } from "@/lib/http";
-
-export async function POST(request: Request) {
-  try { const viewer = getViewer(request); if (!viewer) return apiError("AUTH_REQUIRED", "Sign in first.", 401); await getD1().prepare("DELETE FROM spotify_connections WHERE user_id=?").bind(viewer.userId).run(); return json({ disconnected: true }); }
-  catch (error) { return routeError(error); }
+import { cookies } from "next/headers";
+import { eq } from "drizzle-orm";
+import { sameOrigin, requireUser } from "../../../../lib/auth";
+import { db } from "../../../../lib/db";
+import { users } from "../../../../db/schema";
+export async function POST(req: Request) {
+  try {
+    sameOrigin(req);
+    const u = await requireUser();
+    await db().delete(users).where(eq(users.id, u.id));
+    (await cookies()).delete("sortify_session");
+    return Response.json({ ok: true });
+  } catch {
+    return Response.json({ error: "Could not disconnect" }, { status: 400 });
+  }
 }

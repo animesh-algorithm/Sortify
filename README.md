@@ -1,42 +1,33 @@
 # Sortify
 
-Sortify is a private Phase 0 feasibility workbench for organizing a Spotify library safely. It imports a normalized snapshot, measures deterministic and MusicBrainz-backed metadata, ranks organization suggestions, previews the exact write, and can create one private test playlist after confirmation.
+A private music organizer: connect Spotify → choose sources → organize → review and edit → approve → create new private playlists.
 
-## Safety boundaries
+Standard Next.js 16 / React 19, Drizzle on Neon Postgres, Spotify Authorization Code OAuth, and Inngest durable jobs. ReccoBeats enrichment runs only on the server. No legacy database is migrated.
 
-- Existing Spotify playlists are never renamed, reordered, deleted, or edited.
-- Write previews are persisted, hashed, expire after one hour, and must be confirmed explicitly.
-- Playlist creation and item batches are logged with an idempotency key so retries resume the same operation.
-- The report fails closed when normalization, precision, usefulness, write safety, or policy compatibility is unverified.
+## Run locally
 
-## Configuration
+Use Node 22.13 or newer. `npm install`, copy `.env.example` into `.env.local`, and fill in the configuration. Existing `.env` was deliberately preserved; update the old Spotify redirect in the Spotify developer dashboard and your local environment to `http://127.0.0.1:3000/api/spotify/callback`.
 
-Copy `.env.example` to `.env.local` and supply:
+- Use a fresh Neon database and set `DATABASE_URL`; do not point this migration at a legacy database.
+- Set Spotify client ID, client secret, and exact redirect URI.
+- Set `TOKEN_ENCRYPTION_KEY` to 32 random bytes encoded in base64 (`openssl rand -base64 32`). Changing it invalidates existing encrypted tokens.
+- Sortify accepts all Spotify accounts that Spotify permits to authorize your app; there is no application account allowlist.
+- Set `APP_URL` to the public origin, or the local origin above.
 
-- `SPOTIFY_CLIENT_ID`
-- `SPOTIFY_CLIENT_SECRET`
-- `SPOTIFY_REDIRECT_URI`
-- `TOKEN_ENCRYPTION_KEY` (at least 24 random characters)
-- `MUSICBRAINZ_CONTACT`
+Run `npm run db:migrate`, then `npm run dev -- --hostname 127.0.0.1`. Start Inngest local development with `npx inngest-cli@latest dev -u http://127.0.0.1:3000/api/inngest`. Local Inngest does not require cloud keys.
 
-Use the exact HTTPS callback URL configured in the Spotify developer dashboard for deployment. Local Spotify callbacks should use an explicit loopback IP such as `127.0.0.1`, not `localhost`.
+## Deploy on Vercel
 
-## Development
+Use the standard Next.js preset and Node 22 or newer. Configure the same environment variables, production Spotify callback, and Inngest event/signing keys. Run the migration against the fresh Neon database before onboarding. Register `/api/inngest` with Inngest (or use its Vercel integration). Both job functions are exposed there; the route has a 60-second execution budget and work is broken into durable steps.
 
-```bash
-npm run dev
-npm test
-npm run build
-```
+Confirm the Spotify app's quota/access mode, owner Premium subscription, and account allowlist in the developer dashboard before live testing. Development Mode imports only owned or collaborative playlists, plus Liked Songs. Requests use `/items` and `POST /me/playlists`.
 
-Generate a new migration after schema changes with `npm run db:generate`. Apply each pending migration to the local D1 preview in order using the Wrangler command documented in the starter tooling; deployed Sites apply packaged migrations automatically.
+## Checks
 
-## Workflow
+`npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`. With the local server running, `npm run test:browser` exercises mocked source/progress/editor/approval/publication screens and real unauthenticated OAuth/CSRF endpoints. Browser checks use installed Chrome by default; set `QA_CHROME_EXECUTABLE` for another installation. `npm run probe:recco` performs a read-only, two-ID provider contract probe.
 
-1. Connect Spotify through server-side Authorization Code OAuth.
-2. Import saved tracks and permitted playlist items through resumable steps.
-3. Analyze a stratified sample and add manual spot labels.
-4. Review ranked suggestions with confidence and provenance.
-5. Persist and inspect an exact write preview.
-6. Confirm one private test playlist.
-7. Export the feasibility decision as JSON or Markdown.
+See [validation and live rollout](docs/validation.md) and [implementation details](docs/architecture.md).
+
+## Preservation
+
+The replaced dirty and untracked workspace was archived at `.local-backups/pre-spotify-rebuild-20260918-043507/workspace.tar.gz`, with a manifest and Git status. Secrets, generated artifacts, dependencies, and internal runtime state were excluded. The original `.env` remains local and ignored. The repository history is retained.

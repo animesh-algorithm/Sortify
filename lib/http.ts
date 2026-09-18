@@ -1,21 +1,27 @@
-import { z } from "zod";
-
-export type ApiErrorCode = "AUTH_REQUIRED" | "NOT_CONFIGURED" | "NOT_FOUND" | "INVALID_INPUT" | "CONFLICT" | "RATE_LIMITED" | "UPSTREAM_ERROR" | "STORAGE_ERROR";
-
-export function apiError(code: ApiErrorCode, message: string, status = 400, details?: unknown) {
-  return Response.json({ error: { code, message, details } }, { status });
+export function failure(e: unknown) {
+  console.warn("request-failed", {
+    reason: e instanceof Error ? e.name : "unknown",
+  });
+  const message = e instanceof Error ? e.message : "";
+  const actions: Record<string, string> = {
+    "Revision changed":
+      "Your selection changed in another window. Refresh before saving.",
+    "Approve your changes first":
+      "Review and approve your current selection first.",
+    "Nothing selected": "Choose at least one playlist with tracks.",
+    "Cannot resume": "This step is already running. Give it a moment.",
+    "Run cancelled":
+      "This organization was cancelled. Choose music to start again.",
+  };
+  return Response.json(
+    {
+      error:
+        message === "Reconnect Spotify"
+          ? message
+          : message.startsWith("Playlist")
+            ? message
+            : (actions[message] ?? "Something went wrong. Try again."),
+    },
+    { status: message === "Reconnect Spotify" ? 401 : 400 },
+  );
 }
-
-export async function parseJson<T>(request: Request, schema: z.ZodType<T>): Promise<T> {
-  return schema.parse(await request.json());
-}
-
-export function routeError(error: unknown) {
-  if (error instanceof z.ZodError) return apiError("INVALID_INPUT", "The request could not be validated.", 400, error.flatten());
-  const message = error instanceof Error ? error.message : "Unexpected error";
-  console.error("Sortify route error", error);
-  if (message.includes("D1") || message.includes("no such table")) return apiError("STORAGE_ERROR", "Sortify storage is unavailable. Try again after migrations finish.", 503);
-  return apiError("UPSTREAM_ERROR", message, 502);
-}
-
-export function json<T>(value: T, init?: ResponseInit) { return Response.json(value, init); }
