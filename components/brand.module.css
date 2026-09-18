@@ -1,0 +1,15 @@
+.brand.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.14em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.brand > svg {
+  width: 0.95em;
+  height: 1em;
+  flex-shrink: 0;
+}

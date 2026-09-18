@@ -35,7 +35,7 @@ test("queued jobs can retry dispatch without discarding the saved selection", as
             },
     });
   });
-  await page.goto("/");
+  await page.goto("/app");
   await expect(page.getByText("Getting ready…")).toBeVisible();
   await page.getByRole("button", { name: "Retry start" }).click();
   await expect.poll(() => commands.length).toBe(1);
@@ -113,7 +113,7 @@ test("one-click reclustering and explicit import-all keep individual actions vis
             },
     });
   });
-  await page.goto("/");
+  await page.goto("/app");
   await expect(
     page.getByRole("button", { name: "Add First to Spotify" }),
   ).toBeVisible();
@@ -123,7 +123,9 @@ test("one-click reclustering and explicit import-all keep individual actions vis
   expect(commands).toHaveLength(0);
   await expect(page.getByRole("radio")).toHaveCount(0);
   await expect(page.getByLabel("Reclustering mode")).toHaveCount(0);
-  await page.getByRole("button", { name: "Recluster", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Try another mix", exact: true })
+    .click();
   await expect.poll(() => commands.length).toBe(1);
   expect(commands[0]).toEqual({
     action: "recluster",
@@ -131,10 +133,10 @@ test("one-click reclustering and explicit import-all keep individual actions vis
     mode: "blend",
   });
   page.once("dialog", (dialog) => dialog.dismiss());
-  await page.getByRole("button", { name: "Import all playlists" }).click();
+  await page.getByRole("button", { name: "Add all to Spotify" }).click();
   expect(commands).toHaveLength(1);
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Import all playlists" }).click();
+  await page.getByRole("button", { name: "Add all to Spotify" }).click();
   await expect.poll(() => commands.length).toBe(2);
   expect(commands[1]).toEqual({
     action: "import",
@@ -211,8 +213,8 @@ for (const width of [375, 768, 1024, 1440])
       }
       await route.fulfill({ json: body });
     });
-    await page.goto("/");
-    await page.getByText("Start with your favorites.").waitFor();
+    await page.goto("/app");
+    await page.getByText("Where should we look?").waitFor();
     await expect(page.getByRole("radio")).toHaveCount(0);
     expect(
       await page.evaluate(
@@ -224,8 +226,10 @@ for (const width of [375, 768, 1024, 1440])
       fullPage: true,
     });
     await page.getByLabel("Liked Songs").check();
-    await page.getByRole("button", { name: "Organize my music" }).click();
-    await expect(page.getByText("Your music is next in line.")).toBeVisible();
+    await page.getByRole("button", { name: "Rediscover my music" }).click();
+    await expect(
+      page.getByText("Getting ready to rediscover your music."),
+    ).toBeVisible();
     run = {
       ...run!,
       status: "importing",
@@ -282,7 +286,7 @@ for (const width of [375, 768, 1024, 1440])
         algorithm: "v1",
       },
     };
-    await page.getByText("Make these yours.").waitFor();
+    await page.getByText("Find your next listen.").waitFor();
     await page.getByRole("button", { name: "Edit Easy flow playlist" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(
@@ -352,24 +356,50 @@ for (const width of [375, 768, 1024, 1440])
       fullPage: true,
     });
   });
-test("landing is responsive and connects through server OAuth", async ({
-  page,
-}) => {
-  await page.route("**/api/state", (route) =>
-    route.fulfill({ json: { user: null, runs: [], publications: [] } }),
-  );
-  await page.setViewportSize({ width: 375, height: 900 });
-  await page.goto("/");
-  await expect(
-    page.getByRole("link", { name: "Connect Spotify" }),
-  ).toHaveAttribute("href", "/api/spotify/connect");
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
-  await page.screenshot({ path: "outputs/landing-375.png", fullPage: true });
-});
+for (const width of [375, 768, 1024, 1440])
+  test(`marketing page at ${width}px`, async ({ page }) => {
+    let libraryRequests = 0;
+    page.on("request", (request) => {
+      if (
+        request.url().includes("/api/state") ||
+        request.url().includes("/api/sources")
+      )
+        libraryRequests++;
+    });
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "The same twenty on repeat.",
+    );
+    for (const link of await page
+      .getByRole("link", { name: "Rediscover my music" })
+      .all())
+      await expect(link).toHaveAttribute("href", "/api/spotify/connect");
+    await expect(
+      page.getByRole("link", { name: "Open Sortify" }),
+    ).toHaveAttribute("href", "/app");
+    await page
+      .locator("summary")
+      .filter({ hasText: "Will Sortify change my Liked Songs?" })
+      .click();
+    await expect(
+      page.getByText("No. Your saved songs stay where they are.", {
+        exact: false,
+      }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth === innerWidth &&
+          document.body.scrollWidth === innerWidth,
+      ),
+    ).toBe(true);
+    expect(libraryRequests).toBe(0);
+    await page.screenshot({
+      path: `outputs/landing-${width}.png`,
+      fullPage: true,
+    });
+  });
 test("OAuth state cookie is httpOnly and callback rejects forged and replayed states", async ({
   request,
 }) => {
@@ -384,6 +414,7 @@ test("OAuth state cookie is httpOnly and callback rejects forged and replayed st
     expect(location.searchParams.get("state")!.length).toBeGreaterThan(40);
   } else {
     expect(location.origin).toBe("http://127.0.0.1:3000");
+    expect(location.pathname).toBe("/app");
     expect(location.searchParams.get("error")).toMatch(
       /^(setup|database_setup|encryption_setup)$/,
     );
@@ -395,7 +426,7 @@ test("OAuth state cookie is httpOnly and callback rejects forged and replayed st
   );
   expect(callback.status()).toBe(302);
   expect(callback.headers()["set-cookie"]).toContain("sortify_oauth=");
-  expect(callback.headers().location).toContain("error=connect");
+  expect(callback.headers().location).toContain("/app?error=connect");
   const replay = await request.get(
     `/api/spotify/callback?state=${location.searchParams.get("state")}&code=fake`,
     { maxRedirects: 0 },
@@ -404,7 +435,7 @@ test("OAuth state cookie is httpOnly and callback rejects forged and replayed st
   const state = await request.get("/api/state");
   expect((await state.json()).user).toBeNull();
   const write = await request.post("/api/runs", {
-    headers: { Origin: "http://127.0.0.1:3000" },
+    headers: { Origin: new URL(callback.headers().location).origin },
     data: { sources: ["liked"], mode: "groups" },
   });
   expect(write.status()).toBe(401);
@@ -448,7 +479,7 @@ test("remaining song count follows live progress", async ({ page }) => {
           : [{ id: "liked", name: "Liked Songs", count: 10 }],
     });
   });
-  await page.goto("/");
+  await page.goto("/app");
   await expect(page.getByRole("status")).toContainText("8 songs left");
   analyzed = 6;
   await expect(page.getByRole("status")).toContainText("4 songs left", {
@@ -524,7 +555,7 @@ test("live playlist preview stays compact while work continues", async ({
             },
     });
   });
-  await page.goto("/");
+  await page.goto("/app");
   const preview = page.getByRole("region", { name: "Playlists taking shape" });
   await expect(preview).toContainText("50 songs checked");
   await expect(preview).toContainText("Easy flow");

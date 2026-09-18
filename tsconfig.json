@@ -30,7 +30,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    ".next-seo/types/**/*.ts",
+    ".next-seo/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules", ".local-backups"]
 }

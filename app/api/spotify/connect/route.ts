@@ -8,7 +8,7 @@ export async function GET() {
   if (setupError)
     return Response.redirect(
       new URL(
-        "/?error=" + setupError,
+        "/app?error=" + setupError,
         process.env.APP_URL ?? "http://127.0.0.1:3000",
       ),
     );

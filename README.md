@@ -29,6 +29,8 @@ Use the current stable production domain for the Inngest app URL (`https://sorti
 `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`. With the local server running, `npm run test:browser` exercises mocked source/progress/editor/approval/publication screens and real unauthenticated OAuth/CSRF endpoints. Browser checks use installed Chrome by default; set `QA_CHROME_EXECUTABLE` for another installation. `npm run probe:recco` performs a read-only, two-ID provider contract probe.
 
 See [validation and live rollout](docs/validation.md) and [implementation details](docs/architecture.md).
+See [SEO rollout, Search Console setup and earned-backlink strategy](docs/seo.md)
+for indexing configuration, isolated browser QA and remaining production checks.
 
 ## Preservation
 

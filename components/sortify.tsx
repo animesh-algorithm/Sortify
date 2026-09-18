@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Brand from "./brand";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RunData, Source, Suggestion } from "../lib/model";
@@ -201,10 +202,10 @@ function LivePlaylistPreview({ run }: { run: Run }) {
                     <Image
                       className="live-modal-album"
                       src={track.image}
-                      alt=""
+                      alt={`Album artwork for ${track.album.name}`}
                       width={46}
                       height={46}
-                      unoptimized
+                      sizes="46px"
                     />
                   ) : (
                     <span
@@ -401,7 +402,7 @@ export default function Sortify() {
     <main>
       <header>
         <Link className="wordmark" href="/" aria-label="Sortify home">
-          <span className="logo">≋</span> sortify<span className="dot">.</span>
+          <Brand />
         </Link>
         <div className="header-right">
           <span className="beta">BETA</span>
@@ -432,30 +433,30 @@ export default function Sortify() {
       {!state.user ? (
         <section className="landing">
           <div className="intro">
-            <p className="eyebrow">YOUR MUSIC, WITH A LITTLE MORE MEANING</p>
+            <p className="eyebrow">YOUR MUSIC, BACK IN YOUR LIFE</p>
             <h1>
-              Good music.
+              You already found
               <br />
-              Better <em>company.</em>
+              <em>the music.</em>
             </h1>
             <p className="lede">
-              Your favorites belong together. Find the little connections in
-              your library, and make room for your next favorite playlist.
+              Let’s find it again. Give the favorites buried in your Liked Songs
+              another turn, with playlists made from the music you saved.
             </p>
             <a className="button primary" href="/api/spotify/connect">
               Connect Spotify <span>↗</span>
             </a>
             <p className="small">
               {loaded
-                ? "Made from the music you already love."
+                ? "Your Liked Songs stays just as it is."
                 : "Getting things ready…"}
               <br />
-              You review every playlist before it’s created.
+              Review the new playlists and choose what to add to Spotify.
             </p>
           </div>
           <div
             className="record-scene"
-            aria-label="Illustration of a record and organized playlists"
+            aria-label="Illustration of saved favorites brought together into playlists"
           >
             <div className="orbit" />
             <div className="vinyl">
@@ -484,25 +485,25 @@ export default function Sortify() {
               </div>
             </div>
             <span className="scene-note">
-              Same favorites. Fresh perspective.
+              Your favorites. Back in rotation.
             </span>
           </div>
         </section>
       ) : (
         <>
           <div className="workspace-intro">
-            <p className="eyebrow">A LITTLE ORDER. A LOT OF YOU.</p>
+            <p className="eyebrow">YOUR MUSIC, BACK IN YOUR LIFE</p>
             <h1>
-              Your library,
+              Your favorites,
               <br />
-              <em>reimagined.</em>
+              <em>worth another listen.</em>
             </h1>
             <p>
-              Hi {state.user.name}. Let’s put your favorites in good company.
+              Hi {state.user.name}. Let’s find something you forgot you loved.
             </p>
           </div>
-          <nav className="steps" aria-label="Organization progress">
-            {["Choose music", "Find connections", "Make it yours"].map(
+          <nav className="steps" aria-label="Rediscovery progress">
+            {["Choose music", "Find your playlists", "Make it yours"].map(
               (s, i) => (
                 <span
                   key={s}
@@ -528,8 +529,11 @@ export default function Sortify() {
             <section className="source-layout">
               <div>
                 <div className="section-heading">
-                  <h2>Start with your favorites.</h2>
-                  <p>Choose the music you’d like to organize.</p>
+                  <h2>Where should we look?</h2>
+                  <p>
+                    Start with Liked Songs, or choose playlists you’d love to
+                    hear again.
+                  </p>
                 </div>
                 <div className="source-list">
                   {!sources.length && <p>Loading your music…</p>}
@@ -553,7 +557,9 @@ export default function Sortify() {
                       </span>
                       <span>
                         <strong>{s.name}</strong>
-                        <small>{s.count} tracks</small>
+                        <small>
+                          {s.count} {s.count === 1 ? "song" : "songs"}
+                        </small>
                       </span>
                       <span className="source-arrow">↗</span>
                     </label>
@@ -561,10 +567,11 @@ export default function Sortify() {
                 </div>
               </div>
               <aside>
-                <p className="eyebrow">GOOD COMPANY STARTS HERE</p>
-                <h2>A fresh perspective.</h2>
+                <p className="eyebrow">FROM SAVED TO PLAYED</p>
+                <h2>There’s good music in there.</h2>
                 <p className="small">
-                  Choose your music. We’ll find the playlists.
+                  You chose the songs. Sortify brings them together into
+                  playlists you’ll want to play.
                 </p>
                 <button
                   className="button primary full"
@@ -578,26 +585,28 @@ export default function Sortify() {
                     })
                   }
                 >
-                  Organize my music <span>→</span>
+                  Rediscover my music <span>→</span>
                 </button>
                 <p className="small">
-                  {selected.length} source{selected.length === 1 ? "" : "s"}{" "}
-                  selected. Your original music stays right where it is.
+                  {selected.length}{" "}
+                  {selected.length === 1 ? "collection" : "collections"}{" "}
+                  selected. Your Liked Songs and existing playlists stay as they
+                  are.
                 </p>
               </aside>
             </section>
           ) : working ? (
             <section className="progress-panel">
               <div className="progress-icon">≋</div>
-              <p className="eyebrow">FINDING THE CONNECTIONS</p>
+              <p className="eyebrow">GIVING YOUR FAVORITES ANOTHER TURN</p>
               <h2>
                 {run.status === "importing"
                   ? "Gathering your favorites."
                   : run.status === "enriching"
                     ? "Getting to know your music."
                     : run.status === "analyzing"
-                      ? "Putting good company together."
-                      : "Your music is next in line."}
+                      ? "Bringing your playlists together."
+                      : "Getting ready to rediscover your music."}
               </h2>
               <ol className="music-progress" aria-label="Your music's progress">
                 {[
@@ -680,7 +689,8 @@ export default function Sortify() {
                 </p>
               </div>
               <p className="small">
-                Updates live. You can leave this page and come back.
+                Your playlists take shape here. You can leave and come back
+                while Sortify works.
               </p>
               <div className="actions">
                 {run.status === "queued" && (
@@ -710,11 +720,14 @@ export default function Sortify() {
             <section>
               <div className="review-heading">
                 <div>
-                  <h2>Make these yours.</h2>
-                  <p>Find a mix you love. Make it part of your Spotify.</p>
+                  <h2>Find your next listen.</h2>
+                  <p>
+                    Spot an old favorite? Rename a playlist, move songs, and
+                    keep what feels right.
+                  </p>
                 </div>
                 <span>
-                  {run.data.tracks.length} tracks · {suggestions.length}{" "}
+                  {run.data.tracks.length} songs · {suggestions.length}{" "}
                   playlists
                 </span>
               </div>
@@ -752,7 +765,7 @@ export default function Sortify() {
                       });
                     }}
                   >
-                    <span aria-hidden="true">↻</span> Recluster
+                    <span aria-hidden="true">↻</span> Try another mix
                   </button>
                   <button
                     className="button"
@@ -786,7 +799,7 @@ export default function Sortify() {
                       })
                     }
                   >
-                    Audio features
+                    Group by listening mood
                   </button>
                   <button
                     className="button"
@@ -794,7 +807,7 @@ export default function Sortify() {
                     onClick={() => {
                       if (
                         window.confirm(
-                          `Import all ${pendingSelection.length} playlists to Spotify?`,
+                          `Add all ${pendingSelection.length} playlists to Spotify? Your Liked Songs and existing playlists will stay as they are.`,
                         )
                       )
                         void act(() =>
@@ -802,15 +815,15 @@ export default function Sortify() {
                         );
                     }}
                   >
-                    Import all playlists
+                    Add all to Spotify
                   </button>
                 </div>
               </div>
               {!suggestions.length && (
                 <div>
                   <p>
-                    No tracks were available in those sources. Try another
-                    selection.
+                    We couldn’t find any songs in that selection. Choose another
+                    playlist or try your Liked Songs.
                   </p>
                   <button
                     className="button"
@@ -873,10 +886,10 @@ export default function Sortify() {
                                 <Image
                                   className="album-art"
                                   src={t.image}
-                                  alt=""
+                                  alt={`Album artwork for ${t.album.name}`}
                                   width={34}
                                   height={34}
-                                  unoptimized
+                                  sizes="34px"
                                 />
                               ) : (
                                 <span
@@ -1084,7 +1097,7 @@ export default function Sortify() {
                       </div>
                       <div className="modal-track-heading" aria-hidden="true">
                         <span>#</span>
-                        <span>Track</span>
+                        <span>Song</span>
                         <span>Move to</span>
                         <span />
                       </div>
@@ -1103,10 +1116,10 @@ export default function Sortify() {
                                 <Image
                                   className="album-art"
                                   src={track.image}
-                                  alt=""
+                                  alt={`Album artwork for ${track.album.name}`}
                                   width={44}
                                   height={44}
-                                  unoptimized
+                                  sizes="44px"
                                 />
                               ) : (
                                 <span
@@ -1241,14 +1254,14 @@ export default function Sortify() {
               >
                 {run.status === "publishing"
                   ? "Finish adding playlists first"
-                  : "Organize more music"}
+                  : "Rediscover more music"}
               </button>
             </section>
           ) : (
             <section className="progress-panel">
               <h2>
                 {run.status === "cancelled"
-                  ? "A fresh start?"
+                  ? "Ready for another listen?"
                   : "Let’s try that again."}
               </h2>
               <p>{run.error ?? "Choose your music whenever you’re ready."}</p>
@@ -1276,10 +1289,8 @@ export default function Sortify() {
         </>
       )}
       <footer>
-        <span>A little order for your music.</span>
-        <span>
-          MADE FOR YOUR COLLECTION <span className="dot">✳</span>
-        </span>
+        <span>You already found the music. Find it again.</span>
+        <span>YOUR MUSIC. BACK IN YOUR LIFE.</span>
       </footer>
     </main>
   );

@@ -1,0 +1,968 @@
+.page {
+  --brown: #392822;
+  --lilac: #d9cbea;
+  --pink: #f7b5cb;
+  --yellow: #f9e89e;
+  color: var(--brown);
+  background: #fff9ee;
+  font-family: var(--font-dm-sans), sans-serif;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+.page h1,
+.page h2,
+.page h3,
+.wordmark {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+}
+.page h1,
+.page h2 {
+  letter-spacing: -2.7px;
+  line-height: 1.04;
+}
+.page h1 {
+  font-size: clamp(46px, 4.9vw, 72px);
+  margin: 24px 0;
+}
+.page h2 {
+  font-size: clamp(36px, 4vw, 58px);
+  margin: 20px 0 26px;
+}
+.page h3 {
+  font-size: 27px;
+  letter-spacing: -0.8px;
+  margin: 18px 0 12px;
+}
+.page em {
+  font-style: normal;
+  color: #765584;
+}
+.page p {
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 14px 0;
+}
+.page a {
+  text-decoration: none;
+}
+.page a:focus-visible,
+.page summary:focus-visible {
+  outline: 3px solid #765584;
+  outline-offset: 6px;
+}
+.main {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+.header {
+  height: 104px;
+  padding: 0 max(5%, calc((100vw - 1300px) / 2));
+  background: var(--lilac);
+  border-bottom: 1px solid #39282230;
+  gap: 30px;
+}
+.wordmark {
+  font-size: 40px;
+  letter-spacing: -2px;
+  white-space: nowrap;
+}
+
+.header nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.open,
+.cta {
+  border: 2px solid var(--brown);
+  border-radius: 100px;
+  background: var(--yellow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  box-shadow: 3px 4px 0 var(--brown);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.open {
+  padding: 12px 22px;
+}
+.cta {
+  padding: 17px 26px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+.cta:hover,
+.open:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 2px 0 var(--brown);
+}
+.eyebrow {
+  font-size: 11px !important;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+.hero {
+  position: relative;
+  background: var(--lilac);
+  display: grid;
+  grid-template-columns: 1.07fr 1fr;
+  gap: 30px;
+  padding: 62px max(5%, calc((100vw - 1300px) / 2)) 190px;
+  isolation: isolate;
+}
+.heroCopy {
+  z-index: 2;
+}
+.heroCopy > p:not(.eyebrow) {
+  max-width: 480px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.reassurance {
+  font-size: 12px;
+  margin-top: 19px;
+}
+.scene {
+  position: relative;
+  min-width: 0;
+  min-height: 550px;
+  align-self: center;
+}
+.sceneCircle {
+  position: absolute;
+  width: 390px;
+  height: 390px;
+  left: 50%;
+  top: 55px;
+  transform: translateX(-50%);
+  background: #eadff3;
+  border: 1px solid #39282225;
+  border-radius: 50%;
+}
+.friend {
+  position: absolute;
+  width: 350px;
+  left: 50%;
+  top: 50px;
+  transform: translateX(-50%) rotate(-8deg);
+}
+.playlist {
+  position: absolute;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 2px solid var(--brown);
+  border-radius: 15px;
+  box-shadow: 4px 5px 0 #392822;
+  min-width: 225px;
+  background: #fff9ee;
+}
+.playlist strong {
+  font-size: 17px;
+  display: block;
+  margin: 5px 0;
+}
+.playlist small {
+  font-size: 8px;
+  letter-spacing: 1.3px;
+  font-weight: 700;
+}
+.cover {
+  display: grid;
+  place-items: center;
+  width: 65px;
+  height: 70px;
+  border: 1.5px solid var(--brown);
+  border-radius: 8px;
+  font-size: 40px;
+  background: #f6d783;
+  flex-shrink: 0;
+}
+.morning {
+  top: 6px;
+  left: 0;
+  transform: rotate(-9deg);
+}
+.home {
+  right: -5px;
+  top: 282px;
+  transform: rotate(8deg);
+  background: #f7bdcf;
+}
+.home .cover {
+  background: #b9c79d;
+}
+.lift {
+  bottom: 8px;
+  left: 15px;
+  transform: rotate(-5deg);
+  background: #f9e89e;
+}
+.lift .cover {
+  background: #b8c8df;
+}
+.wave {
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+.spark {
+  position: absolute;
+  right: 12px;
+  top: 24px;
+  font-size: 66px;
+  color: #f9e89e;
+  -webkit-text-stroke: 2px var(--brown);
+  transform: rotate(12deg);
+}
+.note {
+  position: absolute;
+  left: 0;
+  top: 230px;
+  font-size: 49px;
+  transform: rotate(-15deg);
+}
+.handwritten {
+  position: absolute;
+  bottom: 0;
+  right: 12px;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  font-style: italic;
+  transform: rotate(8deg);
+  max-width: 130px;
+}
+.rainbow {
+  position: absolute;
+  bottom: -2px;
+  overflow: visible;
+  translate: 0 var(--drift, 0px);
+  left: 0;
+  width: 100%;
+  height: 220px;
+  z-index: 1;
+  pointer-events: none;
+}
+.feeling {
+  padding: 110px 8% 90px;
+  text-align: center;
+}
+.feeling > p:not(.eyebrow) {
+  max-width: 610px;
+  margin: 18px auto;
+}
+.memoryNotes {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 50px;
+  flex-wrap: wrap;
+}
+.memoryNotes span {
+  padding: 18px 24px;
+  border: 1px solid var(--brown);
+  background: #f7d9b4;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  transform: rotate(-4deg);
+  box-shadow: 2px 3px 0 var(--brown);
+}
+.memoryNotes span:nth-child(2) {
+  background: #d9cbea;
+  transform: rotate(3deg);
+}
+.memoryNotes span:nth-child(3) {
+  background: #e3e8ba;
+  transform: rotate(-2deg);
+}
+.change {
+  padding: 65px max(8%, calc((100vw - 1150px) / 2)) 90px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  align-items: center;
+}
+.change h2 {
+  max-width: 450px;
+}
+.albumArt {
+  aspect-ratio: 1;
+  position: relative;
+  background: #f7b5cb;
+  border: 2px solid var(--brown);
+  border-radius: 18px;
+  box-shadow: 8px 9px 0 var(--brown);
+  transform: rotate(-5deg);
+  overflow: hidden;
+}
+.sun {
+  position: absolute;
+  font-size: 350px;
+  line-height: 1;
+  right: -50px;
+  top: -65px;
+  color: #f9e89e;
+  -webkit-text-stroke: 2px var(--brown);
+}
+.albumLabel {
+  position: absolute;
+  left: 28px;
+  bottom: 62px;
+  font-size: 60px;
+  line-height: 0.95;
+  letter-spacing: -3px;
+  font-family: Georgia, serif;
+  font-weight: 700;
+}
+.albumLabel span {
+  display: block;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  margin-top: 20px;
+}
+.albumNote {
+  position: absolute;
+  bottom: 24px;
+  left: 28px;
+  font-size: 16px;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+.how {
+  background: #e9edcf;
+  padding: 85px 6%;
+  text-align: center;
+  border-top: 1px solid #39282230;
+  border-bottom: 1px solid #39282230;
+  scroll-margin-top: 30px;
+}
+.steps {
+  max-width: 1200px;
+  margin: 50px auto 35px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  text-align: left;
+}
+.steps article {
+  padding: 28px;
+  border: 2px solid var(--brown);
+  border-radius: 18px;
+  background: #fff9ee;
+  box-shadow: 4px 5px 0 var(--brown);
+}
+.steps article:nth-child(2) {
+  background: #e2d6ef;
+}
+.steps article:nth-child(3) {
+  background: #f5c6d5;
+}
+.steps p {
+  font-size: 15px;
+}
+.stepTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stepTop span:first-child {
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+.stepTop span:last-child {
+  font-size: 46px;
+  line-height: 1;
+}
+.library {
+  max-width: 780px;
+  margin: 48px auto 0;
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  text-align: left;
+}
+.library > span {
+  font-size: 60px;
+}
+.library h3 {
+  font-size: 25px;
+  margin: 0;
+}
+.library p {
+  font-size: 14px;
+  margin: 8px 0;
+}
+.questions {
+  padding: 95px 8%;
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 70px;
+  max-width: 1300px;
+  margin: auto;
+  scroll-margin-top: 30px;
+}
+.questions details {
+  border-bottom: 1px solid #39282260;
+}
+.questions summary {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 25px 0;
+  cursor: pointer;
+}
+.questions summary::-webkit-details-marker {
+  display: none;
+}
+.questions summary span {
+  font-size: 25px;
+  line-height: 1;
+}
+.questions details[open] summary span {
+  transform: rotate(45deg);
+}
+.questions details p {
+  font-size: 15px;
+  margin: 0 0 24px;
+  max-width: 530px;
+}
+.faqDoodle {
+  font-size: 78px;
+  display: block;
+  transform: rotate(-15deg);
+  color: #765584;
+  margin-left: 30px;
+}
+.closing {
+  position: relative;
+  isolation: isolate;
+  background: var(--lilac);
+  padding: 80px 8% 150px;
+  text-align: center;
+  min-height: 580px;
+  border-top: 1px solid #39282230;
+}
+.closing h2 {
+  font-size: clamp(52px, 6vw, 85px);
+}
+.closing > p:not(.eyebrow) {
+  font-size: 16px;
+}
+.smallFriend {
+  position: absolute;
+  width: 190px;
+  right: 10%;
+  top: 180px;
+  transform: rotate(12deg);
+}
+.closingStar {
+  position: absolute;
+  left: 12%;
+  top: 160px;
+  color: #f9e89e;
+  font-size: 100px;
+  -webkit-text-stroke: 2px var(--brown);
+}
+.closing .rainbow {
+  height: 140px;
+}
+.footer {
+  padding: 35px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 12px;
+}
+.footer .wordmark {
+  font-size: 30px;
+}
+.skip {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #fff9ee;
+  padding: 14px;
+  z-index: 20;
+  transform: translateY(-150%);
+}
+.skip:focus {
+  transform: none;
+}
+@media (min-width: 1500px) {
+  .hero {
+    gap: 70px;
+  }
+}
+@media (max-width: 1050px) {
+  .header nav {
+    gap: 20px;
+  }
+  .hero {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 10px;
+    padding-top: 45px;
+  }
+  .scene {
+    min-height: 500px;
+  }
+  .friend {
+    width: 280px;
+    top: 80px;
+  }
+  .sceneCircle {
+    width: 300px;
+    height: 300px;
+    top: 100px;
+  }
+  .playlist {
+    min-width: 190px;
+    padding: 10px;
+    gap: 10px;
+  }
+  .playlist strong {
+    font-size: 14px;
+  }
+  .cover {
+    width: 48px;
+    height: 55px;
+    font-size: 32px;
+  }
+  .morning {
+    top: 40px;
+  }
+  .home {
+    top: 295px;
+  }
+  .lift {
+    bottom: 0;
+    left: 0;
+  }
+  .handwritten {
+    display: none;
+  }
+  .change {
+    gap: 50px;
+  }
+  .albumLabel {
+    font-size: 45px;
+  }
+  .smallFriend {
+    right: 3%;
+    width: 145px;
+  }
+  .closingStar {
+    left: 4%;
+    font-size: 75px;
+  }
+  .steps article {
+    padding: 22px;
+  }
+  .page h3 {
+    font-size: 24px;
+  }
+}
+@media (max-width: 760px) {
+  .header {
+    height: 90px;
+    padding: 0 6%;
+    gap: 15px;
+  }
+  .wordmark {
+    font-size: 32px;
+  }
+  .header nav > a:not(.open) {
+    display: none;
+  }
+  .open {
+    font-size: 12px;
+    padding: 10px 15px;
+    gap: 12px;
+  }
+  .hero {
+    display: block;
+    padding: 35px 7% 130px;
+  }
+  .page h1 {
+    font-size: clamp(44px, 8vw, 66px);
+    letter-spacing: -2px;
+    max-width: 600px;
+  }
+  .heroCopy > p:not(.eyebrow) {
+    max-width: 530px;
+  }
+  .scene {
+    max-width: 480px;
+    margin: 40px auto 0;
+    min-height: 440px;
+  }
+  .friend {
+    width: 290px;
+    top: 30px;
+  }
+  .sceneCircle {
+    top: 45px;
+  }
+  .morning {
+    top: 0;
+    left: 0;
+  }
+  .home {
+    top: 232px;
+    right: 0;
+  }
+  .lift {
+    bottom: 0;
+    left: 0;
+  }
+  .spark {
+    font-size: 48px;
+    right: 5px;
+    top: 5px;
+  }
+  .note {
+    top: 180px;
+    font-size: 35px;
+  }
+  .rainbow {
+    height: 120px;
+  }
+  .feeling {
+    padding: 55px 7%;
+  }
+  .page h2 {
+    letter-spacing: -1.5px;
+  }
+  .memoryNotes {
+    gap: 18px;
+    margin-top: 30px;
+  }
+  .memoryNotes span {
+    font-size: 15px;
+    padding: 13px 18px;
+  }
+  .change {
+    grid-template-columns: 1fr;
+    padding: 45px 8% 65px;
+    gap: 50px;
+  }
+  .albumArt {
+    width: 80%;
+    max-width: 350px;
+    justify-self: center;
+  }
+  .albumLabel {
+    font-size: 50px;
+  }
+  .change h2 {
+    max-width: none;
+  }
+  .how {
+    padding: 60px 7%;
+  }
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 23px;
+    margin-top: 35px;
+  }
+  .steps article {
+    padding: 24px;
+  }
+  .library {
+    gap: 15px;
+    align-items: flex-start;
+  }
+  .library > span {
+    font-size: 40px;
+  }
+  .questions {
+    grid-template-columns: 1fr;
+    padding: 55px 7%;
+    gap: 10px;
+  }
+  .questions h2 br {
+    display: none;
+  }
+  .faqDoodle {
+    display: none;
+  }
+  .questions summary {
+    font-size: 16px;
+  }
+  .closing {
+    padding: 60px 7% 135px;
+    min-height: 530px;
+  }
+  .closing h2 {
+    font-size: 58px;
+  }
+  .smallFriend {
+    width: 100px;
+    right: -15px;
+    top: 10px;
+    opacity: 0.9;
+  }
+  .closingStar {
+    font-size: 42px;
+    left: 15px;
+    top: 20px;
+  }
+  .footer {
+    flex-wrap: wrap;
+    padding: 28px 7%;
+    gap: 16px;
+  }
+  .footer > span {
+    margin-left: auto;
+  }
+  .footer > a:last-child {
+    width: 100%;
+    text-align: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page * {
+    transition: none;
+  }
+}
+@media (max-width: 760px) {
+  .albumArt .sun {
+    font-size: 210px;
+    top: -50px;
+    right: -45px;
+  }
+  .albumLabel {
+    font-size: 38px;
+    bottom: 64px;
+  }
+  .albumLabel span {
+    margin-top: 14px;
+  }
+  .questions h2 br {
+    display: block;
+  }
+  .closing h2 {
+    font-size: clamp(44px, 11vw, 58px);
+  }
+  .smallFriend {
+    top: 40px;
+    right: -38px;
+  }
+}
+
+.icon {
+  width: 24px;
+  height: 26px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.wordmark > .icon {
+  width: 38px;
+  height: 40px;
+  margin-right: 6px;
+}
+.cover .icon {
+  width: 75%;
+  height: 75%;
+}
+.spark .icon,
+.note .icon,
+.faqDoodle .icon,
+.closingStar .icon {
+  width: 1em;
+  height: 1em;
+}
+.sun .icon {
+  width: 1em;
+  height: 1em;
+  fill: var(--yellow);
+  stroke: var(--brown);
+  stroke-width: 0.25;
+}
+.spark .icon,
+.closingStar .icon {
+  fill: var(--yellow);
+  stroke: var(--brown);
+  stroke-width: 0.5;
+}
+.stepTop > .icon {
+  width: 46px;
+  height: 48px;
+}
+.library > .icon {
+  width: 56px;
+  height: 60px;
+}
+.memoryNotes span {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.memoryNotes .icon {
+  width: 20px;
+  height: 22px;
+}
+.wave {
+  display: flex;
+  height: 24px;
+  align-items: center;
+  gap: 4px;
+}
+.wave i {
+  width: 3px;
+  border-radius: 3px;
+  background: var(--brown);
+  animation: equalize 1.3s ease-in-out infinite alternate;
+}
+.friend,
+.smallFriend {
+  animation: bob 4.8s ease-in-out infinite;
+}
+.playlist {
+  animation: bob 5.5s ease-in-out infinite;
+  transition:
+    box-shadow 0.3s,
+    scale 0.3s;
+}
+.home {
+  animation-delay: -1.8s;
+}
+.lift {
+  animation-delay: -3.4s;
+}
+.scene:hover .playlist {
+  scale: 1.04;
+  box-shadow: 7px 9px 0 var(--brown);
+}
+.spark,
+.closingStar {
+  animation: twinkle 6s ease-in-out infinite;
+}
+.note,
+.faqDoodle {
+  animation: sway 4s ease-in-out infinite;
+}
+.steps article {
+  transition:
+    translate 0.35s,
+    box-shadow 0.35s;
+}
+.steps article:hover {
+  translate: 0 -8px;
+  box-shadow: 7px 13px 0 var(--brown);
+}
+.page a .icon {
+  transition: translate 0.25s;
+}
+.page a:hover .icon {
+  translate: 2px -2px;
+}
+.questions summary span {
+  transition: transform 0.3s;
+}
+.questions details[open] p {
+  animation: answer 0.4s ease both;
+}
+.footer {
+  position: relative;
+  z-index: 0;
+  background: transparent;
+  flex-wrap: wrap;
+  padding-top: 55px;
+}
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  align-items: center;
+}
+.footerLinks a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.footerLinks .icon {
+  width: 16px;
+  height: 18px;
+}
+@keyframes bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -12px;
+  }
+}
+@keyframes sway {
+  0%,
+  100% {
+    rotate: -7deg;
+  }
+  50% {
+    rotate: 9deg;
+  }
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    rotate: -9deg;
+    scale: 0.94;
+  }
+  50% {
+    rotate: 14deg;
+    scale: 1.08;
+  }
+}
+@keyframes equalize {
+  from {
+    scale: 1 0.45;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes answer {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (max-width: 760px) {
+  .feeling {
+    padding-top: 75px;
+  }
+  .footerLinks {
+    width: 100%;
+    gap: 14px 20px;
+  }
+  .footer .wordmark {
+    width: auto;
+    text-align: left;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page *,
+  .page *::before,
+  .page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

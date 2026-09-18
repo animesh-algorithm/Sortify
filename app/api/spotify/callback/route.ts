@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     if (!expected || !state || !equal(expected, state) || !code)
       throw new Error("Invalid OAuth state");
     const setupError = spotifySetupError();
-    if (setupError) return Response.redirect(base + "/?error=" + setupError);
+    if (setupError) return Response.redirect(base + "/app?error=" + setupError);
     stage = "token";
     const t = await tokenExchange(
       new URLSearchParams({
@@ -70,12 +70,12 @@ export async function GET(req: Request) {
         maxAge: 7 * 86400,
       });
     });
-    return Response.redirect(base);
+    return Response.redirect(base + "/app");
   } catch (e) {
     console.warn("oauth-failed", {
       stage,
       reason: e instanceof Error ? e.name : "unknown",
     });
-    return Response.redirect(base + "/?error=connect");
+    return Response.redirect(base + "/app?error=connect");
   }
 }
